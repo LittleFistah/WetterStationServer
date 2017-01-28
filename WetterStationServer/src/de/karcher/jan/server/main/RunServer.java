@@ -2,6 +2,8 @@ package de.karcher.jan.server.main;
 
 import java.awt.EventQueue;
 
+import de.karcher.jan.server.controller.Server;
+
 public class RunServer{
 
 	public static void main(String[] args) {
@@ -9,6 +11,7 @@ public class RunServer{
 			
 			@Override
 			public void run() {
+				Server server = new Server();
 			}
 		});
 	}
