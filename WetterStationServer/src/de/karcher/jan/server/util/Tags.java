@@ -4,7 +4,7 @@ public enum Tags {
 
 	LSTATION, LCLIENT, SERVER, HSTATION, HCLIENT;
 
-	public String print() {
+	public String print(int i) {
 		switch (this) {
 		case SERVER:
 			return "[Server] ";
@@ -13,9 +13,9 @@ public enum Tags {
 		case LCLIENT:
 			return "[ListenerClient] ";
 		case HSTATION:
-			return "[HandlerStation] ";
+			return "[HandlerStation "+ i+"] ";
 		case HCLIENT:
-			return "[HandlerClient] ";
+			return "[HandlerClient "+ i+"] ";
 		}
 		return null;
 	}

@@ -9,6 +9,7 @@ public class ServerConfig {
 	private final int portStation = 5555;
 	private final int portClient = 6666;
 	private final int defaultTimeout = 1500;
+	private final int defaultUITimeout = 5000;
 	private boolean isRunning, isListeningStation, isListeningClient;
 
 	public ServerConfig() {
@@ -58,5 +59,9 @@ public class ServerConfig {
 
 	public int getDefaultTimeout() {
 		return defaultTimeout;
+	}
+
+	public int getDefaultUITimeout() {
+		return defaultUITimeout;
 	}
 }

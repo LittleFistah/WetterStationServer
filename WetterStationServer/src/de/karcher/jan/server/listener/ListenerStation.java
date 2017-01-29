@@ -5,7 +5,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.util.concurrent.TimeoutException;
 
 import de.karcher.jan.server.controller.Server;
 import de.karcher.jan.server.util.Logger;
@@ -32,7 +31,7 @@ public class ListenerStation extends Thread {
 		try {
 			socket.setSoTimeout(cfg.getDefaultTimeout());
 		} catch (SocketException e) {
-			logger.addDefaultLog(Tags.LSTATION.print() + e.getMessage());
+			logger.addDefaultLog(Tags.LSTATION.print(0) + e.getMessage());
 		}
 		this.start();
 	}
@@ -40,18 +39,18 @@ public class ListenerStation extends Thread {
 	@Override
 	public void run() {
 		cfg.setListeningStation(true);
-		logger.addDefaultLog(Tags.LSTATION.print() + "Listener auf " + socket.getInetAddress().getHostAddress() + ":"
+		logger.addDefaultLog(Tags.LSTATION.print(0) + "Listener auf " + socket.getInetAddress().getHostAddress() + ":"
 				+ socket.getLocalPort() + " wurde gestartet.");
 		while (cfg.isListeningStation()) {
 			try {
 				station = socket.accept();
 				if (station.isConnected()) {
-					logger.addDefaultLog(Tags.LSTATION.print() + "Neue Station verbunden.");
+					logger.addDefaultLog(Tags.LSTATION.print(0) + "Neue Station verbunden.");
 					server.reportStation(station);
 				}
 			} catch (SocketTimeoutException toe) {
 			} catch (IOException e) {
-				logger.addDefaultLog(Tags.LSTATION.print() + e.getMessage());
+				logger.addDefaultLog(Tags.LSTATION.print(0) + e.getMessage());
 			}
 		}
 	}

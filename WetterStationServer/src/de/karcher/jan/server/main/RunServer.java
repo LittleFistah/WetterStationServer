@@ -11,6 +11,7 @@ public class RunServer{
 			
 			@Override
 			public void run() {
+				@SuppressWarnings("unused")
 				Server server = new Server();
 			}
 		});
