@@ -18,5 +18,8 @@ public class Logger {
 	public void addDefaultLog(String msg){
 		System.out.println(msg);
 	}
+	public void addDBLog(String msg){
+		System.out.println(msg);		
+	}
 	
 }

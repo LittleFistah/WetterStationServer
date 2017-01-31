@@ -2,7 +2,7 @@ package de.karcher.jan.server.util;
 
 public enum Tags {
 
-	LSTATION, LCLIENT, SERVER, HSTATION, HCLIENT;
+	LSTATION, LCLIENT, SERVER, HSTATION, HCLIENT, DBMANAGER;
 
 	public String print(int i) {
 		switch (this) {
@@ -16,6 +16,8 @@ public enum Tags {
 			return "[HandlerStation "+ i+"] ";
 		case HCLIENT:
 			return "[HandlerClient "+ i+"] ";
+		case DBMANAGER:
+			return "[DBManager] ";
 		}
 		return null;
 	}

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import de.karcher.jan.server.gui.MainFrame;
 import de.karcher.jan.server.handler.HandlerStation;
 import de.karcher.jan.server.listener.ListenerStation;
+import de.karcher.jan.server.manager.DBManager;
 import de.karcher.jan.server.manager.DataManager;
 import de.karcher.jan.server.util.Logger;
 import de.karcher.jan.server.util.ServerConfig;
@@ -19,6 +20,7 @@ public class Server {
 	private Logger logger;
 	private ServerConfig serverConfig;
 	private DataManager dataManager;
+	private DBManager dbManager;
 	private ServerSocket serverSocketStation, serverSocketClient;
 	private ListenerStation lStation;
 	private MainFrame window;
@@ -47,6 +49,8 @@ public class Server {
 
 		lStation = new ListenerStation(this, logger, serverSocketStation, serverConfig);
 		
+		dbManager = new DBManager(this, logger);
+		
 		window = new MainFrame(this);
 	}
 
@@ -56,7 +60,7 @@ public class Server {
 		stationCount++;
 	}
 	
-	public void shutdownServer(){
+	public synchronized void shutdownServer(){
 		System.out.println("shutdown Server");
 	}
 	
