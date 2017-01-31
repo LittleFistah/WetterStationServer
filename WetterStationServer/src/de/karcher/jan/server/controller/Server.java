@@ -82,4 +82,7 @@ public class Server {
 	public synchronized int getDefaultUITimeout(){
 		return serverConfig.getDefaultUITimeout();
 	}
+	public synchronized void setInitData(ArrayList<WetterData> data){
+		dataManager.setInitData(data);
+	}
 }

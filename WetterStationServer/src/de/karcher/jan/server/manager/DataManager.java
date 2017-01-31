@@ -55,4 +55,9 @@ public class DataManager {
 			}
 		});
 	}
+
+	public void setInitData(ArrayList<WetterData> data) {
+		this.data = data;
+		sort();		
+	}
 }
