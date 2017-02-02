@@ -61,6 +61,10 @@ public class Server {
 	}
 	
 	public synchronized void shutdownServer(){
+		for(HandlerStation hs : listStation){
+			hs.shutdownServer();
+			listStation.remove(hs);
+		}
 		System.out.println("shutdown Server");
 	}
 	
@@ -71,6 +75,8 @@ public class Server {
 				stationCount--;
 			}
 		}
+		dbManager.shutdown();
+		
 	}
 	
 	public synchronized void setData(int hr, int r, char typ, int value, double value1) {

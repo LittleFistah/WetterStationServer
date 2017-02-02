@@ -10,7 +10,7 @@ import javax.swing.table.DefaultTableModel;
 import de.karcher.jan.server.controller.Server;
 import de.karcher.jan.server.util.WetterData;
 
-public class StationPane extends JPanel {
+public class DataPane extends JPanel {
 
 	private Server server;
 	private ArrayList<WetterData> dataWetterData;
@@ -42,7 +42,7 @@ public class StationPane extends JPanel {
 		};
 	};
 
-	public StationPane(Server server) {
+	public DataPane(Server server) {
 		init(server);
 	}
 

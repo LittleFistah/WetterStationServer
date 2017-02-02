@@ -1,8 +1,10 @@
 package de.karcher.jan.server.handler;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -102,6 +104,21 @@ public class HandlerStation extends Thread {
 		server.setData(hr, r, typ, value, value1);
 	}
 	
+	public void shutdownServer(){
+		server = null;
+		logger = null;
+		try {
+			BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(station.getOutputStream()));
+			bw.write("<e>\n");
+			bw.flush();
+			bw.close();
+			reader.close();
+			station.close();
+		} catch (IOException e) {
+			logger.addHandlerLog(Tags.HSTATION.print(stationId) + e.getMessage());			
+		}		
+		this.interrupt();
+	}
 	public int getStationId() {
 		return stationId;
 	}

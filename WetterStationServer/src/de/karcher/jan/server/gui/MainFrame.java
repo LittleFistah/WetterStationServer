@@ -54,7 +54,7 @@ public class MainFrame extends JFrame {
 		super.setTitle("WetterStation - Server");
 		
 		tp = new JTabbedPane();		
-		tp.add("Wetterdaten", new StationPane(server).getPanel());
+		tp.add("Wetterdaten", new DataPane(server).getPanel());
 		
 		super.add(tp);
 		super.pack();

@@ -43,7 +43,11 @@ public class DataManager {
 	
 	public ArrayList<WetterData> getAllData() {
 		sort();
-		return data;
+		ArrayList<WetterData> tmp = new ArrayList<WetterData>();
+		for(WetterData x : data){
+			tmp.add(new WetterData(x.getHauptregion(), x.getRegion(), x.getTemperatur(), x.getStatus(), x.getWindstaerke()));
+		}
+		return tmp;
 	}
 	private void sort(){
 		Collections.sort(data, new Comparator<WetterData>() {
