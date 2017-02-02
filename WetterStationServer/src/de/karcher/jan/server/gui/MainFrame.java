@@ -7,18 +7,21 @@ import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 
 import de.karcher.jan.server.controller.Server;
+import de.karcher.jan.server.util.ServerConfig;
 
 public class MainFrame extends JFrame {
 
 	private Server server;
+	private ServerConfig cfg;
 	private JTabbedPane tp;
 
-	public MainFrame(Server server) {
-		init(server);
+	public MainFrame(Server server,ServerConfig cfg) {
+		init(server,cfg);
 	}
 
-	private void init(Server server) {
+	private void init(Server server, ServerConfig cfg) {
 		this.server = server;
+		this.cfg = cfg;
 		super.addWindowListener(new WindowListener() {
 			@Override
 			public void windowClosed(WindowEvent e) {
@@ -54,6 +57,7 @@ public class MainFrame extends JFrame {
 		super.setTitle("WetterStation - Server");
 		
 		tp = new JTabbedPane();		
+		tp.add("Informationen", new InfoPanel(server, cfg));
 		tp.add("Wetterdaten", new DataPane(server).getPanel());
 		
 		super.add(tp);

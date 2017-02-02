@@ -50,8 +50,7 @@ public class Server {
 		lStation = new ListenerStation(this, logger, serverSocketStation, serverConfig);
 		
 		dbManager = new DBManager(this, logger);
-		
-		window = new MainFrame(this);
+				window = new MainFrame(this,serverConfig);
 	}
 
 	public void reportStation(Socket station) {
@@ -66,6 +65,7 @@ public class Server {
 			listStation.remove(hs);
 		}
 		System.out.println("shutdown Server");
+		System.exit(0);
 	}
 	
 	public synchronized void shutdownStation(int id){

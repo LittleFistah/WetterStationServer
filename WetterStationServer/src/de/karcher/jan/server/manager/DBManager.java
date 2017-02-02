@@ -46,7 +46,7 @@ public class DBManager {
 		public void run() {
 			while (true) {
 				try {
-					sleep(60000 * 1);
+					sleep(60000 * 5);
 				} catch (InterruptedException e) {
 				}
 				wetterData = server.getAllData();
