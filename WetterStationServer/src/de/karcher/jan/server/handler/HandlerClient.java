@@ -26,16 +26,79 @@ public class HandlerClient extends Thread {
 	private Date tmpDate;
 	private String firstContact, lastRequest;
 	private SimpleDateFormat df;
-	private boolean isAllRequested, isMainRegion;
-	private String mainRegion,subRegion;
+	private String mainRegion, subRegion, typ;
+	private boolean isMittel, isVoll, isWetter;
 	private Thread sender = new Thread() {
 		public void run() {
+			try {
+				writer.write("<I-ID>" + clientId + "\n");
+				writer.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			long lastSend = 0l;
 			ArrayList<WetterData> data;
-			while(true){
-				if(lastSend - System.currentTimeMillis() > server.getClientIntervall()){
-					data = server.getAllData();
+			String upd = "";
+			try {
+				while (true) {
+					if (System.currentTimeMillis() - lastSend > server.getClientIntervall()) {
+						writer.write("<I-SCNT>" + server.getStationCount() + "\n");
+						writer.flush();
+						writer.write("<I-CCNT>" + server.getClientCount() + "\n");
+						writer.flush();
+						data = server.getAllData();
+
+						if (isWetter) {
+							for (WetterData x : data) {
+								if (x.getHauptregion() == Integer.valueOf(mainRegion)
+										&& x.getRegion() == Integer.valueOf(subRegion)) {
+									upd = "<u>" + x.getStatus() + ":" + x.getWindstaerke() + ":" + x.getTemperatur();
+								}
+							}
+						} else if (isMittel) {
+							int dW = 0;
+							int dS = 0;
+							double dT = 0d;
+							for (WetterData x : data) {
+								if (x.getHauptregion() == Integer.valueOf(mainRegion)) {
+									dW += x.getWindstaerke();
+									dS += x.getStatus();
+									dT += x.getTemperatur();
+								}
+							}
+							dW /= 10;
+							dS /= 10;
+							dT /= 10;
+							upd = "<u>" + dS + ":" + dW + ":" + dT;
+						} else if (isVoll) {
+							upd = "<u>";
+							for (WetterData x : data) {
+								switch (typ) {
+								case "S":
+									upd += x.getStatus();
+									break;
+								case "W":
+									upd += x.getWindstaerke();
+									break;
+								case "T":
+									upd += x.getTemperatur();
+									break;
+								}
+								if (x.getHauptregion() == 9 && x.getRegion() == 9) {
+								}else{
+									upd+=":";
+								}
+							}
+						}
+						if (upd != "") {
+							writer.write(upd + "\n");
+							writer.flush();
+						}
+						lastSend = System.currentTimeMillis();
+					}
 				}
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		};
 	};
@@ -59,6 +122,11 @@ public class HandlerClient extends Thread {
 		tmpDate = new Date();
 		firstContact = df.format(tmpDate);
 
+		isWetter = false;
+		isMittel = false;
+		isVoll = false;
+
+		sender.start();
 		this.start();
 	}
 
@@ -68,52 +136,63 @@ public class HandlerClient extends Thread {
 		String line;
 		try {
 			while ((line = reader.readLine()).compareTo("<e>") != 0) {
-				if (line.contains("<r>")) {
-					getRequest(line.substring(3));
-					tmpDate = new Date();
-					lastRequest = df.format(tmpDate);
-					requestCount++;
+
+				tmpDate = new Date();
+				lastRequest = df.format(tmpDate);
+				requestCount++;
+				System.out.println(line);
+				if (line.contains("<r>W")) {
+					isWetter = true;
+					isMittel = false;
+					isVoll = false;
+					mainRegion = line.substring(4, 5);
+					subRegion = line.substring(5, 6);
+				} else if (line.contains("<r>M")) {
+					isWetter = false;
+					isMittel = true;
+					isVoll = false;
+					mainRegion = line.substring(4, 5);
+				} else if (line.contains("<r>V")) {
+					isWetter = false;
+					isMittel = false;
+					isVoll = true;
+					typ = line.substring(4, 5);
 				}
 			}
 			shutdown();
 		} catch (IOException e) {
 			logger.addHandlerLog(Tags.HCLIENT.print(clientId) + e.getMessage());
+			shutdown();
 		}
 	}
 
-	private void getRequest(String x){
-		if (x.substring(1, 2).equals("00")){
-			setIsAllRequested(true);
-		}else if (x.substring(2,2).equals("*")){
-			setMainRegion(x.substring(1, 1));
-			setIsMainRegion(true);
-		}else{
-			setMainRegion(x.substring(1, 1));
-			setSubRegion(x.substring(2, 2));
-		}
-		
-	}
-	
 	private void shutdown() {
 		server.shutdownClient(clientId);
 		server = null;
 		logger = null;
 		try {
+			writer.write("<e>\n");
+			writer.flush();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		try {
 			client.close();
 			reader.close();
+			writer.close();
 		} catch (IOException e) {
 			logger.addHandlerLog(Tags.HCLIENT.print(clientId) + e.getMessage());
 		}
 		this.interrupt();
 	}
+
 	public void shutdownServer() {
 		server = null;
 		logger = null;
 		try {
-			BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(client.getOutputStream()));
-			bw.write("<e>\n");
-			bw.flush();
-			bw.close();
+			writer.write("<e>\n");
+			writer.flush();
+			writer.close();
 			reader.close();
 			client.close();
 		} catch (IOException e) {
@@ -136,29 +215,5 @@ public class HandlerClient extends Thread {
 
 	public String getLastUpdate() {
 		return lastRequest;
-	}
-	private synchronized boolean getIsMainRegion(){
-		return isMainRegion;
-	}
-	private synchronized boolean getIsAllRequested(){
-		return isAllRequested;
-	}
-	private synchronized void setIsMainRegion(boolean b){ 
-		isMainRegion = b;
-	}
-	private synchronized void setIsAllRequested(boolean b){
-		isAllRequested = b;
-	}
-	private synchronized String getMainRegion(){
-		return mainRegion;
-	}
-	private synchronized String getSubRegion(){
-		return subRegion;
-	}
-	private synchronized void setMainRegion(String s){ 
-		mainRegion = s;
-	}
-	private synchronized void setSubRegion(String s){
-		subRegion = s;
 	}
 }

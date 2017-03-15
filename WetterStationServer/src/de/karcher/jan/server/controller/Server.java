@@ -120,6 +120,12 @@ public class Server {
 	public synchronized void setInitData(ArrayList<WetterData> data){
 		dataManager.setInitData(data);
 	}
+	public synchronized int getClientCount(){
+		return clientCount;
+	}
+	public synchronized int getStationCount(){
+		return stationCount;
+	}
 
 
 }
