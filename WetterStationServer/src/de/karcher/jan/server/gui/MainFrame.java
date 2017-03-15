@@ -1,5 +1,6 @@
 package de.karcher.jan.server.gui;
 
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
@@ -58,7 +59,11 @@ public class MainFrame extends JFrame {
 		
 		tp = new JTabbedPane();		
 		tp.add("Informationen", new InfoPanel(server, cfg));
+		tp.setMnemonicAt(0, KeyEvent.VK_1);
 		tp.add("Wetterdaten", new DataPane(server).getPanel());
+		tp.setMnemonicAt(1, KeyEvent.VK_2);
+		
+		tp.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 		
 		super.add(tp);
 		super.pack();

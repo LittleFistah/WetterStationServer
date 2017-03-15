@@ -4,9 +4,14 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Iterator;
+
+import javax.jws.HandlerChain;
 
 import de.karcher.jan.server.gui.MainFrame;
+import de.karcher.jan.server.handler.HandlerClient;
 import de.karcher.jan.server.handler.HandlerStation;
+import de.karcher.jan.server.listener.ListenerClient;
 import de.karcher.jan.server.listener.ListenerStation;
 import de.karcher.jan.server.manager.DBManager;
 import de.karcher.jan.server.manager.DataManager;
@@ -23,12 +28,15 @@ public class Server {
 	private DBManager dbManager;
 	private ServerSocket serverSocketStation, serverSocketClient;
 	private ListenerStation lStation;
+	private ListenerClient lClient;
 	private MainFrame window;
 
 	private int stationId, stationCount;
+	private int clientId, clientCount;
 
 	private ArrayList<HandlerStation> listStation;
-
+	private ArrayList<HandlerClient> listClient;
+	
 	public Server() {
 		init();
 	}
@@ -46,8 +54,11 @@ public class Server {
 		}
 
 		listStation = new ArrayList<HandlerStation>();
+		listClient = new ArrayList<HandlerClient>();
 
 		lStation = new ListenerStation(this, logger, serverSocketStation, serverConfig);
+		lClient = new ListenerClient(this, logger, serverSocketClient, serverConfig);
+		
 		
 		dbManager = new DBManager(this, logger);
 				window = new MainFrame(this,serverConfig);
@@ -58,25 +69,40 @@ public class Server {
 		listStation.add(new HandlerStation(this, logger, station, ++stationId));
 		stationCount++;
 	}
+	public void reportClient(Socket client) {
+		logger.addDefaultLog(Tags.SERVER.print(0) + "Neuer Client anmelden.");
+		listClient.add(new HandlerClient(this, logger, client, ++clientId));
+		clientCount++;		
+	}
 	
 	public synchronized void shutdownServer(){
-		for(HandlerStation hs : listStation){
-			hs.shutdownServer();
-			listStation.remove(hs);
+		for(Iterator<HandlerStation> it = listStation.iterator(); it.hasNext();){
+			HandlerStation x = it.next();
+			x.shutdownServer();
+			it.remove();
 		}
-		System.out.println("shutdown Server");
+		
+		
 		System.exit(0);
 	}
 	
 	public synchronized void shutdownStation(int id){
-		for (HandlerStation hs : listStation){
-			if(hs.getStationId() == id){
-				listStation.remove(hs);
+		for(Iterator<HandlerStation> it = listStation.iterator(); it.hasNext();){
+			HandlerStation x = it.next();
+			if (x.getStationId() == id){
+				it.remove();
 				stationCount--;
 			}
+		}		
+	}
+	public void shutdownClient(int id) {
+		for(Iterator<HandlerClient> it = listClient.iterator(); it.hasNext();){
+			HandlerClient x = it.next();
+			if (x.getClientId() == id){
+				it.remove();
+				clientCount--;
+			}
 		}
-		dbManager.shutdown();
-		
 	}
 	
 	public synchronized void setData(int hr, int r, char typ, int value, double value1) {
@@ -88,7 +114,12 @@ public class Server {
 	public synchronized int getDefaultUITimeout(){
 		return serverConfig.getDefaultUITimeout();
 	}
+	public synchronized int getClientIntervall(){
+		return serverConfig.getClientIntervall();
+	}
 	public synchronized void setInitData(ArrayList<WetterData> data){
 		dataManager.setInitData(data);
 	}
+
+
 }

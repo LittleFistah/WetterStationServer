@@ -167,18 +167,21 @@ public class DBManager {
 				stmt = con.createStatement();
 				stmt.executeUpdate(query);
 			} catch (SQLException e) {
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 		try {
-			query = "TRUNCATE " + tbUpdate;
+			query = "TRUNCATE `" + tbUpdate+"`";
 			stmt = con.createStatement();
 			stmt.executeUpdate(query);
-			lastUpd = new SimpleDateFormat("YYYYMMDDHHmmss").format(new Date());
-			query = "INSERT INTO " + tbUpdate + " VALUES ('" + lastUpd + "')";
+			lastUpd = new SimpleDateFormat("YYYYMMddHHmmss").format(new Date());
+			query = "INSERT INTO `" + tbUpdate + "` VALUES ('" + lastUpd + "')";
 			stmt = con.createStatement();
-			stmt.executeQuery(query);
+			stmt.executeUpdate(query);
 			logger.addDBLog(Tags.DBMANAGER.print(0) + "Daten wurden in DB gespeichert (" + lastUpd + ").");
 		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 	}
 }
